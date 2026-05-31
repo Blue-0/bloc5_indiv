@@ -89,3 +89,18 @@ $db = static::getDB();
   - Authentification automatique immédiate via `$this->login($f)`.
   - Redirection vers son espace compte `/account` et arrêt propre de l'exécution avec `exit`.
 
+### 4) Fonctionnalité "Se souvenir de moi" (Remember Me)
+
+**Problématique**
+- La case à cocher "Se souvenir de moi" sur l'écran de connexion n'était pas opérationnelle : son état n'était pas envoyé au serveur, aucun cookie n'était créé, et aucune reconnexion automatique n'était effectuée.
+
+**Correctif**
+- **Base de données** : Ajout de la colonne `remember_token` dans la table `users` (et mise à jour de [sql/import.sql](sql/import.sql)).
+- **Modèle** : Ajout des méthodes `updateRememberToken()` et `getByRememberToken()` dans [App/Models/User.php](App/Models/User.php).
+- **Vue (Front)** : Modification de `name="#"` par `name="remember_me"` pour l'input de la case à cocher dans [App/Views/User/login.html](App/Views/User/login.html).
+- **Contrôleur (Back)** :
+  - Dans la méthode `login()` de [App/Controllers/User.php](App/Controllers/User.php) : si l'option est cochée, génération d'un token sécurisé aléatoire, enregistrement en base de données et création d'un cookie HTTP-only `remember_me` expirant sous 30 jours.
+  - Dans la méthode `logoutAction()` : suppression du token en base de données et destruction du cookie.
+- **Bootstrapping (Auto-connexion)** : Ajout d'une vérification dans le fichier d'entrée [public/index.php](public/index.php). Si l'utilisateur n'est pas connecté en session mais possède le cookie `remember_me`, il est automatiquement connecté après vérification en base de données.
+
+

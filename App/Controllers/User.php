@@ -28,10 +28,11 @@ class User extends \Core\Controller
 
             // TODO: Validation
 
-            $this->login($f);
-
-            // Si login OK, redirige vers le compte
-            header('Location: /account');
+            if ($this->login($f)) {
+                // Si login OK, redirige vers le compte
+                header('Location: /account');
+                exit;
+            }
         }
 
         View::renderTemplate('User/login.html');
@@ -105,14 +106,21 @@ class User extends \Core\Controller
             }
 
             $user = \App\Models\User::getByLogin($data['email']);
+            if (!$user) {
+                return false;
+            }
 
             if (Hash::generate($data['password'], $user['salt']) !== $user['password']) {
                 return false;
             }
 
-            // TODO: Create a remember me cookie if the user has selected the option
-            // to remained logged in on the login form.
-            // https://github.com/andrewdyer/php-mvc-register-login/blob/development/www/app/Model/UserLogin.php#L86
+            // Gestion de "Se souvenir de moi"
+            if (isset($data['remember_me'])) {
+                $token = bin2hex(random_bytes(32));
+                \App\Models\User::updateRememberToken($user['id'], $token);
+                // Expire dans 30 jours, accessible uniquement par HTTP (sécurisé)
+                setcookie('remember_me', $token, time() + (30 * 24 * 60 * 60), '/', '', false, true);
+            }
 
             $_SESSION['user'] = array(
                 'id' => $user['id'],
@@ -124,6 +132,7 @@ class User extends \Core\Controller
         } catch (Exception $ex) {
             // TODO : Set flash if error
             /* Utility\Flash::danger($ex->getMessage());*/
+            return false;
         }
     }
 
@@ -137,13 +146,15 @@ class User extends \Core\Controller
      */
     public function logoutAction() {
 
-        /*
-        if (isset($_COOKIE[$cookie])){
-            // TODO: Delete the users remember me cookie if one has been stored.
-            // https://github.com/andrewdyer/php-mvc-register-login/blob/development/www/app/Model/UserLogin.php#L148
-        }*/
-        // Destroy all data registered to the session.
+        if (isset($_SESSION['user']['id'])) {
+            \App\Models\User::updateRememberToken($_SESSION['user']['id'], null);
+        }
 
+        if (isset($_COOKIE['remember_me'])) {
+            setcookie('remember_me', '', time() - 3600, '/');
+        }
+
+        // Destroy all data registered to the session.
         $_SESSION = array();
 
         if (ini_get("session.use_cookies")) {

@@ -23,6 +23,24 @@ set_exception_handler('Core\Error::exceptionHandler');
 
 
 /**
+ * Auto-connexion via cookie "Se souvenir de moi"
+ */
+if (!isset($_SESSION['user']) && isset($_COOKIE['remember_me'])) {
+    try {
+        $user = \App\Models\User::getByRememberToken($_COOKIE['remember_me']);
+        if ($user) {
+            $_SESSION['user'] = [
+                'id' => $user['id'],
+                'username' => $user['username'],
+            ];
+        }
+    } catch (\Exception $e) {
+        // En cas d'erreur de base de données, on ignore silencieusement pour ne pas bloquer l'application
+    }
+}
+
+
+/**
  * Routing
  */
 $router = new Core\Router();

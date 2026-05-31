@@ -45,6 +45,32 @@ class User extends Model {
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Met à jour le jeton de connexion "se souvenir de moi"
+     */
+    public static function updateRememberToken($id, $token) {
+        $db = static::getDB();
+
+        $stmt = $db->prepare('UPDATE users SET remember_token = :token WHERE id = :id');
+        $stmt->bindParam(':token', $token);
+        $stmt->bindParam(':id', $id);
+
+        return $stmt->execute();
+    }
+
+    /**
+     * Récupère un utilisateur par son jeton "se souvenir de moi"
+     */
+    public static function getByRememberToken($token) {
+        $db = static::getDB();
+
+        $stmt = $db->prepare('SELECT * FROM users WHERE remember_token = :token LIMIT 1');
+        $stmt->bindParam(':token', $token);
+        $stmt->execute();
+
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
+    }
+
 
     /**
      * ?
