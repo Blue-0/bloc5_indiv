@@ -2,7 +2,8 @@
     "require": {
         "twig/twig": "~3.0",
       "ext-pdo": "*",
-      "ext-json": "*"
+      "ext-json": "*",
+        "phpmailer/phpmailer": "^7.1"
     },
     "autoload": {
         "psr-4": {

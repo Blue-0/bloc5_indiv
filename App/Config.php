@@ -39,4 +39,12 @@ class Config
      * @var boolean
      */
     const SHOW_ERRORS = true;
+
+    /**
+     * Configuration SMTP Mailtrap
+     */
+    const SMTP_HOST = 'sandbox.smtp.mailtrap.io';
+    const SMTP_PORT = 2525;
+    const SMTP_USER = '632c774e954ee2';
+    const SMTP_PASSWORD = '70a0541079cb30';
 }

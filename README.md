@@ -103,4 +103,18 @@ $db = static::getDB();
   - Dans la méthode `logoutAction()` : suppression du token en base de données et destruction du cookie.
 - **Bootstrapping (Auto-connexion)** : Ajout d'une vérification dans le fichier d'entrée [public/index.php](public/index.php). Si l'utilisateur n'est pas connecté en session mais possède le cookie `remember_me`, il est automatiquement connecté après vérification en base de données.
 
+### 5) Formulaire de contact vendeur (Mailtrap + SOLID)
+
+**Problématique**
+- Le bouton de contact sur la page du produit ouvrait directement la boîte de messagerie par défaut de l'utilisateur via un lien `mailto:`, sans formulaire intégré ni traitement applicatif.
+
+**Correctif**
+- **Dépendance** : Installation de `phpmailer/phpmailer` pour la gestion propre des envois d'e-mails (SMTP).
+- **Configuration** : Ajout des constantes SMTP de Mailtrap dans [App/Config.php](App/Config.php).
+- **Utilitaire (Envoi d'e-mail)** : Création de la classe [App/Utility/Mailer.php](App/Utility/Mailer.php) dédiée à la configuration de PHPMailer et à l'envoi de l'e-mail (encapsulation et respect de la responsabilité unique / SRP).
+- **Vue (Front)** : Remplacement du lien `mailto:` dans [App/Views/Product/Show.html](App/Views/Product/Show.html) par un formulaire de contact Bootstrap demandant l'email de l'acheteur (pré-rempli s'il est connecté) et son message, avec affichage d'alertes de succès/erreur.
+- **Contrôleur (Back)** :
+  - Modification de `showAction()` dans [App/Controllers/Product.php](App/Controllers/Product.php) pour récupérer la soumission du formulaire, valider les entrées, récupérer l'e-mail du propriétaire du produit, composer le message et déclencher l'envoi via `Mailer::send()`.
+
+
 

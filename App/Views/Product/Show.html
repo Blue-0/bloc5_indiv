@@ -36,11 +36,31 @@
                         <h4>Description:</h4>
                         <p>{{article.description}}</p>
                     </div>
-                    <div class="u-area mt-small">
+                    <div class="contact-box mt-30">
+                        <hr>
+                        <h4>Contacter le vendeur ({{ article.username }})</h4>
 
-                    <a name="submit" href="mailto:{{article.email}}" class="btn btn-primary u-btn">Contacter {{article
-                        .username}}</a>
+                        {% if mailStatus == 'success' %}
+                            <div class="alert alert-success mt-10">
+                                <strong>Succès !</strong> Votre message a bien été envoyé par e-mail à {{ article.username }}.
+                            </div>
+                        {% elseif mailStatus == 'error' %}
+                            <div class="alert alert-danger mt-10">
+                                <strong>Erreur !</strong> {{ mailError }}
+                            </div>
+                        {% endif %}
 
+                        <form action="" method="post" class="mt-15">
+                            <div class="form-group">
+                                <label for="buyer_email">Votre adresse email</label>
+                                <input type="email" name="email" id="buyer_email" class="form-control" placeholder="exemple@domaine.com" value="{{ user ? user.email : '' }}" required />
+                            </div>
+                            <div class="form-group">
+                                <label for="message">Votre message</label>
+                                <textarea name="message" id="message" class="form-control" rows="4" placeholder="Bonjour, je suis intéressé(e) par votre annonce..." required></textarea>
+                            </div>
+                            <button type="submit" name="submit_contact" class="btn btn-primary u-btn">Envoyer le message</button>
+                        </form>
                     </div>
                 </div>
             </div>

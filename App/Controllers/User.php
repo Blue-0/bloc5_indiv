@@ -125,6 +125,7 @@ class User extends \Core\Controller
             $_SESSION['user'] = array(
                 'id' => $user['id'],
                 'username' => $user['username'],
+                'email' => $user['email'],
             );
 
             return true;

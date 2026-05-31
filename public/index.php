@@ -32,6 +32,7 @@ if (!isset($_SESSION['user']) && isset($_COOKIE['remember_me'])) {
             $_SESSION['user'] = [
                 'id' => $user['id'],
                 'username' => $user['username'],
+                'email' => $user['email'],
             ];
         }
     } catch (\Exception $e) {
