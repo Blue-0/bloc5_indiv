@@ -24,6 +24,13 @@ class Product extends \Core\Controller
             try {
                 $f = $_POST;
 
+                if (!isset($_FILES['picture']) || $_FILES['picture']['error'] === UPLOAD_ERR_NO_FILE) {
+                    throw new \Exception("Image obligatoire.");
+                }
+                if ($_FILES['picture']['error'] !== UPLOAD_ERR_OK) {
+                    throw new \Exception("Erreur upload (code " . $_FILES['picture']['error'] . ").");
+                }
+
                 // TODO: Validation
 
                 $f['user_id'] = $_SESSION['user']['id'];

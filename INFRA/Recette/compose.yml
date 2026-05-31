@@ -1,0 +1,36 @@
+services:
+    app:
+        build: .
+        ports:
+            - "8088:80"
+        volumes:
+            - ".:/var/www/html/"
+            - "vendor:/var/www/html/vendor"
+        environment:
+            - DB_HOST=db
+            - DB_NAME=videgrenierenligne
+            - DB_USER=webapplication
+            - DB_PASSWORD=653rag9T
+        depends_on:
+            db:
+                condition: service_healthy
+
+    db:
+        image: mariadb:10.11
+        environment:
+            - MARIADB_ROOT_PASSWORD=root
+            - MARIADB_USER=webapplication
+            - MARIADB_PASSWORD=653rag9T
+            - MARIADB_DATABASE=videgrenierenligne
+        volumes:
+            - ./mariadb:/var/lib/mysql
+            - ./sql/import.sql:/docker-entrypoint-initdb.d/01-import.sql:ro
+        healthcheck:
+            test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+            start_period: 10s
+            interval: 10s
+            timeout: 5s
+            retries: 3
+
+volumes:
+    vendor:

@@ -7,6 +7,17 @@ class Upload {
 
     public static function uploadFile($file, $fileName)
     {
+        if (!is_array($file) || !isset($file['error'])) {
+            throw new \Exception("No file was provided.");
+        }
+
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            if ($file['error'] === UPLOAD_ERR_NO_FILE) {
+                throw new \Exception("No file was uploaded.");
+            }
+            throw new \Exception("Upload error (code " . $file['error'] . ").");
+        }
+
         $currentDirectory = getcwd();
         $uploadDirectory = "/storage/";
 
@@ -16,7 +27,7 @@ class Upload {
         $fileSize = $file['size'];
         $fileTmpName = $file['tmp_name'];
 
-        $fileExtension = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
         $pictureName = basename($fileName . '.'. $fileExtension);
 
 

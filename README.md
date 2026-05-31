@@ -37,6 +37,37 @@ View::renderTemplate('Home/index.html', [
     'colours' => ['rouge', 'bleu', 'vert']
 ]);
 ```
+
+
+--------
+
+
+## Résolution des erreurs (Twig + upload image)
+
+### 1) Erreur Twig : `Class Twig\Loader\FilesystemLoader not found`
+
+**Symptôme**
+- Erreur fatale au rendu Twig, avec une classe introuvable.
+
+**Cause**
+- Mauvaise casse (majuscule/minuscule) dans le nom de classe du loader Twig.
+- En environnement Linux/Docker, l'autoload Composer est sensible à la casse.
+
+**Correctif**
+- Correction du nom de classe dans [Core/View.php](Core/View.php) : utilisation de `\Twig\Loader\FilesystemLoader`.
+
+### 2) Exception upload : “This file extension is not allowed…”
+
+**Symptôme**
+- À la soumission du formulaire d'ajout, `$_FILES['picture']` est vide avec `error = 4` (`UPLOAD_ERR_NO_FILE`).
+
+**Cause**
+- Un formulaire HTML imbriqué dans [App/Views/Product/Add.html](App/Views/Product/Add.html) : le clic sur “Valider” soumettait le mauvais `<form>` (sans `enctype="multipart/form-data"`).
+
+**Correctifs**
+- Front : suppression du `<form>` imbriqué autour du bouton “Valider” dans [App/Views/Product/Add.html](App/Views/Product/Add.html) (un seul formulaire, en `multipart/form-data`).
+- Back (image obligatoire) : contrôle de `$_FILES['picture']['error']` dans [App/Controllers/Product.php](App/Controllers/Product.php) avant l'enregistrement.
+- Back (robustesse) : gestion explicite des erreurs `UPLOAD_ERR_*` + normalisation de l'extension en minuscule dans [App/Utility/Upload.php](App/Utility/Upload.php).
 ## Models
 
 Les modèles sont utilisés pour récupérer ou stocker des données dans l'application. Les modèles héritent de `Core
