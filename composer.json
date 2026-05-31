@@ -9,5 +9,12 @@
             "Core\\": "Core/",
             "App\\": "App/"
         }
+    },
+    "config": {
+        "policy": {
+            "advisories": {
+                "block": false
+            }
+        }
     }
 }

@@ -23,7 +23,8 @@ RUN sed -ri 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-availabl
 WORKDIR /var/www/html
 
 COPY docker/php/entrypoint.sh /usr/local/bin/entrypoint
-RUN chmod +x /usr/local/bin/entrypoint
+RUN sed -i 's/\r$//' /usr/local/bin/entrypoint \
+	&& chmod +x /usr/local/bin/entrypoint
 
 ENTRYPOINT ["entrypoint"]
 CMD ["apache2-foreground"]

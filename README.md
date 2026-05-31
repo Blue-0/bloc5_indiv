@@ -77,3 +77,15 @@ Les modèles sont utilisés pour récupérer ou stocker des données dans l'appl
 ```php
 $db = static::getDB();
 ```
+
+### 3) Connexion automatique après inscription
+
+**Problématique**
+- À la création d'un compte, l'utilisateur n'était pas authentifié automatiquement et devait saisir à nouveau ses identifiants sur la page de connexion.
+
+**Correctif**
+- Modification de la méthode `registerAction()` dans [App/Controllers/User.php](App/Controllers/User.php) :
+  - Validation de la création de compte à l'aide de `$this->register($f)`.
+  - Authentification automatique immédiate via `$this->login($f)`.
+  - Redirection vers son espace compte `/account` et arrêt propre de l'exécution avec `exit`.
+
