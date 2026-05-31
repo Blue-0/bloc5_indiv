@@ -117,4 +117,58 @@ $db = static::getDB();
   - Modification de `showAction()` dans [App/Controllers/Product.php](App/Controllers/Product.php) pour récupérer la soumission du formulaire, valider les entrées, récupérer l'e-mail du propriétaire du produit, composer le message et déclencher l'envoi via `Mailer::send()`.
 
 
+## Tests unitaires et d'intégration
+
+L'application intègre une suite de tests automatisés à l'aide de **PHPUnit**.
+
+### 1) Configuration et prérequis
+
+Les tests sont configurés dans le fichier [phpunit.xml](phpunit.xml). Ils s'exécutent par défaut dans le conteneur Docker où la base de données MariaDB est accessible.
+
+Pour installer PHPUnit en local ou dans le conteneur :
+```bash
+composer install
+```
+
+### 2) Exécution des tests
+
+#### À l'intérieur du conteneur Docker (Recommandé)
+Les tests sont automatiquement exécutés à l'initialisation du conteneur (via l'entrypoint `entrypoint.sh`). Si un test échoue, le conteneur ne démarre pas.
+Vous pouvez également les lancer manuellement dans le conteneur en cours d'exécution :
+```bash
+docker compose exec app ./vendor/bin/phpunit
+```
+
+#### En local sur la machine hôte Windows
+Grâce à un système de détection dynamique dans la configuration de `setUp()`, si l'hôte virtuel `db` n'est pas disponible (cas d'une exécution locale hors du réseau Docker), les tests d'intégration redirigent automatiquement la connexion SQL vers `127.0.0.1`.
+*Note : Pour que cela fonctionne, le port de la base de données MariaDB est exposé sur `localhost:3306` via `compose.yml`.*
+
+Pour lancer les tests en local :
+```powershell
+.\vendor\bin\phpunit
+```
+
+### 3) Détail des tests implémentés
+
+La suite de tests contient **21 tests** et **47 assertions** répartis comme suit :
+
+#### Tests Unitaires (Dossier `tests/Unit`)
+Ces tests valident le code fonctionnel sans interaction avec la base de données :
+- [HashTest.php](tests/Unit/HashTest.php) : Teste les utilitaires de hachage de mot de passe `Hash::generate`, la longueur et le caractère aléatoire de `generateSalt`, et la génération des tokens d'UID uniques.
+- [UploadTest.php](tests/Unit/UploadTest.php) : Valide les contrôles de sécurité sur l'upload de fichiers (vérification des exceptions pour fichier absent, extension interdite comme `.pdf` ou `.exe`, et dépassement de la taille limite de 4 Mo).
+- [RouterTest.php](tests/Unit/RouterTest.php) : Teste le mécanisme de routage de l'application (correspondance d'URL simple, extraction des paramètres `{controller}` et `{action}`, et routes complexes basées sur des expressions régulières comme `product/{id:\d+}`).
+
+#### Tests d'Intégration (Dossier `tests/Integration`)
+Ces tests valident les requêtes SQL et les contraintes de base de données à l'aide d'un jeu de données défini. Chaque test démarre une transaction PDO et effectue un `rollback` à la fin de son exécution pour garder la base de données propre.
+- [UserIntegrationTest.php](tests/Integration/UserIntegrationTest.php) :
+  - **Insertion et sélection** : Valide la création de compte utilisateur et sa récupération par e-mail en BDD avec mot de passe haché.
+  - **Absence de valeur obligatoire** : Vérifie qu'une `PDOException` est levée lors d'une tentative d'insertion de compte avec un e-mail `NULL` (colonne NOT NULL).
+  - **Limite de valeur renseignée** : Vérifie qu'une `PDOException` est levée en cas de dépassement de la limite de taille d'un champ (`username` supérieur à 100 caractères).
+- [ArticleIntegrationTest.php](tests/Integration/ArticleIntegrationTest.php) :
+  - **Création d'annonce et image** : Valide l'enregistrement d'une annonce (liée à un utilisateur), le rattachement de sa photo, et sa récupération par jointure SQL.
+  - **Clé étrangère invalide** : Vérifie qu'une `PDOException` est levée si on tente d'associer un article à un utilisateur inexistant (clé étrangère `user_id`).
+  - **Données obligatoires manquantes** : Vérifie le rejet de la sauvegarde en base en cas de titre (`name`) manquant.
+
+
+
 

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="vendor/autoload.php"
+         colors="true"
+         verbose="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false">
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory>tests/Integration</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <!-- Configuration de test pour l'accès à la base MariaDB de Docker -->
+        <env name="DB_HOST" value="db"/>
+        <env name="DB_NAME" value="videgrenierenligne"/>
+        <env name="DB_USER" value="webapplication"/>
+        <env name="DB_PASSWORD" value="653rag9T"/>
+        <env name="SMTP_HOST" value="sandbox.smtp.mailtrap.io"/>
+        <env name="SMTP_PORT" value="2525"/>
+        <env name="SMTP_USER" value="632c774e954ee2"/>
+        <env name="SMTP_PASSWORD" value="70a0541079cb30"/>
+    </php>
+</phpunit>

@@ -1,10 +1,10 @@
 services:
     app:
-        build: .
+        build: ../../.
         ports:
-            - "8088:80"
+            - "8089:80"
         volumes:
-            - ".:/var/www/html/"
+            - "../../:/var/www/html/"
             - "vendor:/var/www/html/vendor"
         environment:
             - DB_HOST=db
@@ -24,7 +24,7 @@ services:
             - MARIADB_DATABASE=videgrenierenligne
         volumes:
             - ./mariadb:/var/lib/mysql
-            - ./sql/import.sql:/docker-entrypoint-initdb.d/01-import.sql:ro
+            - ../../sql/import.sql:/docker-entrypoint-initdb.d/01-import.sql:ro
         healthcheck:
             test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
             start_period: 10s
