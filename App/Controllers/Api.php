@@ -4,38 +4,45 @@ namespace App\Controllers;
 
 use App\Models\Articles;
 use App\Models\Cities;
-use \Core\View;
-use Exception;
 
 /**
- * API controller
+ * Contrôleur API (endpoints JSON)
+ *
+ * Expose des endpoints JSON consommés par le front-end JavaScript.
+ *
+ * PHP version 7.0
  */
 class Api extends \Core\Controller
 {
-
     /**
-     * Affiche la liste des articles / produits pour la page d'accueil
+     * Retourne la liste des articles au format JSON.
      *
-     * @throws Exception
+     * Paramètre GET attendu :
+     * - sort (string) : critère de tri ('views' | 'date' | '')
+     *
+     * @return void
      */
-    public function ProductsAction()
+    public function productsAction(): void
     {
-        $query = $_GET['sort'];
-
-        $articles = Articles::getAll($query);
+        $sort     = filter_input(INPUT_GET, 'sort', FILTER_SANITIZE_SPECIAL_CHARS) ?? '';
+        $articles = Articles::getAll($sort);
 
         header('Content-Type: application/json');
         echo json_encode($articles);
     }
 
     /**
-     * Recherche dans la liste des villes
+     * Recherche des villes par préfixe et retourne les résultats au format JSON.
      *
-     * @throws Exception
+     * Paramètre GET attendu :
+     * - query (string) : préfixe de la ville recherchée
+     *
+     * @return void
      */
-    public function CitiesAction(){
-
-        $cities = Cities::search($_GET['query']);
+    public function citiesAction(): void
+    {
+        $query  = filter_input(INPUT_GET, 'query', FILTER_SANITIZE_SPECIAL_CHARS) ?? '';
+        $cities = Cities::search($query);
 
         header('Content-Type: application/json');
         echo json_encode($cities);

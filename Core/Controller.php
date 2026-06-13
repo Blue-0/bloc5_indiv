@@ -3,43 +3,47 @@
 namespace Core;
 
 /**
- * Base controller
+ * Contrôleur de base (abstrait)
+ *
+ * Tous les contrôleurs de l'application héritent de cette classe.
+ * Elle fournit le mécanisme de filtres before/after et le dispatch
+ * des actions via la méthode magique __call.
  *
  * PHP version 7.0
  */
 abstract class Controller
 {
+    /**
+     * Paramètres extraits de la route correspondante
+     *
+     * @var array<string, string>
+     */
+    protected array $routeParams = [];
 
     /**
-     * Parameters from the matched route
-     * @var array
-     */
-    protected $route_params = [];
-
-    /**
-     * Class constructor
+     * Constructeur : reçoit les paramètres de route depuis le Router.
      *
-     * @param array $route_params  Parameters from the route
-     *
-     * @return void
+     * @param array<string, string> $routeParams Paramètres de la route
      */
-    public function __construct($route_params)
+    public function __construct(array $routeParams)
     {
-        $this->route_params = $route_params;
+        $this->routeParams = $routeParams;
     }
 
     /**
-     * Magic method called when a non-existent or inaccessible method is
-     * called on an object of this class. Used to execute before and after
-     * filter methods on action methods. Action methods need to be named
-     * with an "Action" suffix, e.g. indexAction, showAction etc.
+     * Méthode appelée lorsqu'une méthode inaccessible est invoquée.
      *
-     * @param string $name  Method name
-     * @param array $args Arguments passed to the method
+     * Permet d'appeler les actions via leur nom sans le suffixe 'Action'
+     * (ex. : $controller->index() appelle indexAction()).
+     * Les filtres before() et after() sont exécutés autour de l'action.
+     *
+     * @param string  $name Nom de la méthode appelée (sans suffixe 'Action')
+     * @param mixed[] $args Arguments transmis à la méthode
      *
      * @return void
+     * @throws \Exception Si la méthode '{$name}Action' n'existe pas dans le contrôleur
      */
-    public function __call($name, $args)
+    public function __call(string $name, array $args): void
     {
         $method = $name . 'Action';
 
@@ -49,25 +53,30 @@ abstract class Controller
                 $this->after();
             }
         } else {
-            throw new \Exception("Method $method not found in controller " . get_class($this));
+            throw new \Exception("Méthode '$method' introuvable dans le contrôleur " . get_class($this));
         }
     }
 
     /**
-     * Before filter - called before an action method.
+     * Filtre pré-action : exécuté avant chaque action.
      *
-     * @return void
+     * Peut être surchargé dans les contrôleurs enfants.
+     * Retourner false annule l'exécution de l'action et du filtre after().
+     *
+     * @return void|false
      */
     protected function before()
     {
     }
 
     /**
-     * After filter - called after an action method.
+     * Filtre post-action : exécuté après chaque action.
+     *
+     * Peut être surchargé dans les contrôleurs enfants.
      *
      * @return void
      */
-    protected function after()
+    protected function after(): void
     {
     }
 }

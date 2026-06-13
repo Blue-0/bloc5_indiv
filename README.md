@@ -117,7 +117,31 @@ $db = static::getDB();
   - Modification de `showAction()` dans [App/Controllers/Product.php](App/Controllers/Product.php) pour récupérer la soumission du formulaire, valider les entrées, récupérer l'e-mail du propriétaire du produit, composer le message et déclencher l'envoi via `Mailer::send()`.
 
 
+
+## Refactorisation et Modernisation
+
+Une refactorisation globale du code a été menée pour moderniser le projet et s'aligner sur les bonnes pratiques de développement PHP.
+
+### 1) Convention de nommage (PSR-12)
+Afin de faciliter la maintenance et le travail en équipe, une convention de nommage uniforme a été adoptée :
+* **PascalCase** pour les classes (ex. `Router`, `Mailer`, `Upload`).
+* **camelCase** pour les variables, propriétés et méthodes de classe (ex. `$routeParams`, `$formData`, `productsAction()`).
+* **SCREAMING_SNAKE_CASE** pour les constantes de classe (ex. `MAX_FILE_SIZE`, `ALLOWED_EXTENSIONS`, `SALT_CHARSET`).
+
+### 2) Typage strict et PHP 7
+Le code a été enrichi avec les fonctionnalités de typage de PHP 7 pour améliorer la robustesse et la détection d'erreurs :
+* Ajout des déclarations de types de paramètres et de retour pour toutes les méthodes des contrôleurs, modèles et classes du noyau (`Core\`).
+* Utilisation d'opérateurs modernes comme l'opérateur de coalescence nulle (`??`) pour simplifier et sécuriser la gestion des variables dans les vues.
+* Typage strict des propriétés clés (comme l'instance PDO dans `Core\Model`).
+
+### 3) Amélioration de la sécurité et robustesse
+* **Validation des formulaires** : Remplacement des accès directs aux superglobales par `filter_input` et renforcement des vérifications d'intégrité (ex. validation de la correspondance des mots de passe lors de l'inscription).
+* **Nettoyage du code** : Suppression des méthodes mortes ou obsolètes (ex. méthode `login()` de `App\Models\User`).
+* **Séparation des responsabilités** : Extraction de la logique complexe, comme la génération du corps des e-mails dans `App\Controllers\Product` via une méthode dédiée, pour rendre le code plus modulaire.
+* **Centralisation des configurations** : Utilisation de constantes de classe dédiées dans `Upload` et `Hash` au lieu de valeurs codées en dur.
+
 ## Tests unitaires et d'intégration
+
 
 L'application intègre une suite de tests automatisés à l'aide de **PHPUnit**.
 

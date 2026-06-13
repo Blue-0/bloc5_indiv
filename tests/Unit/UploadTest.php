@@ -10,7 +10,7 @@ class UploadTest extends TestCase
     public function testUploadFileNoFileProvided()
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("No file was provided.");
+        $this->expectExceptionMessage("Aucun fichier fourni.");
         
         Upload::uploadFile(null, "test_file");
     }
@@ -18,7 +18,7 @@ class UploadTest extends TestCase
     public function testUploadFileNoFileUploaded()
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("No file was uploaded.");
+        $this->expectExceptionMessage("Aucun fichier uploadé.");
         
         $file = [
             'error' => UPLOAD_ERR_NO_FILE
@@ -30,7 +30,7 @@ class UploadTest extends TestCase
     public function testUploadFileGenericUploadError()
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("Upload error (code " . UPLOAD_ERR_INI_SIZE . ").");
+        $this->expectExceptionMessage("Erreur lors de l'upload (code " . UPLOAD_ERR_INI_SIZE . ").");
         
         $file = [
             'error' => UPLOAD_ERR_INI_SIZE
@@ -42,7 +42,7 @@ class UploadTest extends TestCase
     public function testUploadFileInvalidExtension()
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("This file extension is not allowed. Please upload a JPEG or PNG file");
+        $this->expectExceptionMessage("Extension non autorisée. Formats acceptés : JPEG, PNG.");
         
         $file = [
             'error' => UPLOAD_ERR_OK,
@@ -57,7 +57,7 @@ class UploadTest extends TestCase
     public function testUploadFileExceedsMaxSize()
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("File exceeds maximum size (4MB)");
+        $this->expectExceptionMessage("Le fichier dépasse la taille maximale autorisée (4 Mo).");
         
         $file = [
             'error' => UPLOAD_ERR_OK,

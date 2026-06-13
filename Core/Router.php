@@ -5,71 +5,81 @@ namespace Core;
 /**
  * Router
  *
+ * Gère la table de routage et le dispatch des requêtes HTTP
+ * vers le contrôleur et l'action appropriés.
+ *
  * PHP version 7.0
  */
 class Router
 {
-
     /**
-     * Associative array of routes (the routing table)
-     * @var array
-     */
-    protected $routes = [];
-
-    /**
-     * Parameters from the matched route
-     * @var array
-     */
-    protected $params = [];
-
-    /**
-     * Add a route to the routing table
+     * Table de routage : tableau associatif [regex => paramètres]
      *
-     * @param string $route  The route URL
-     * @param array  $params Parameters (controller, action, etc.)
+     * @var array<string, array<string, string>>
+     */
+    protected array $routes = [];
+
+    /**
+     * Paramètres extraits de la route correspondante
+     *
+     * @var array<string, string>
+     */
+    protected array $params = [];
+
+    /**
+     * Ajoute une route à la table de routage.
+     *
+     * Les variables de route peuvent être définies entre accolades :
+     * - Simple     : {controller}
+     * - Avec regex : {id:\d+}
+     *
+     * @param string               $route  URL de la route (ex. : 'product/{id:\d+}')
+     * @param array<string, string> $params Paramètres associés (controller, action, etc.)
      *
      * @return void
      */
-    public function add($route, $params = [])
+    public function add(string $route, array $params = []): void
     {
-        // Convert the route to a regular expression: escape forward slashes
+        // Échappe les slashes
         $route = preg_replace('/\//', '\\/', $route);
 
-        // Convert variables e.g. {controller}
+        // Convertit les variables simples, ex. {controller} → (?P<controller>[a-z-]+)
         $route = preg_replace('/\{([a-z]+)\}/', '(?P<\1>[a-z-]+)', $route);
 
-        // Convert variables with custom regular expressions e.g. {id:\d+}
+        // Convertit les variables avec regex, ex. {id:\d+} → (?P<id>\d+)
         $route = preg_replace('/\{([a-z]+):([^\}]+)\}/', '(?P<\1>\2)', $route);
 
-        // Add start and end delimiters, and case insensitive flag
+        // Ajoute les délimiteurs de début/fin et le flag insensible à la casse
         $route = '/^' . $route . '$/i';
 
         $this->routes[$route] = $params;
     }
 
     /**
-     * Get all the routes from the routing table
+     * Retourne toutes les routes enregistrées dans la table de routage.
      *
-     * @return array
+     * @return array<string, array<string, string>>
      */
-    public function getRoutes()
+    public function getRoutes(): array
     {
         return $this->routes;
     }
 
     /**
-     * Match the route to the routes in the routing table, setting the $params
-     * property if a route is found.
+     * Tente de faire correspondre l'URL à une route de la table.
      *
-     * @param string $url The route URL
+     * Si une correspondance est trouvée, les paramètres nommés
+     * sont extraits et stockés dans la propriété $params.
      *
-     * @return boolean  true if a match found, false otherwise
+     * @param string $url L'URL à analyser (sans la query string)
+     *
+     * @return bool true si une route correspond, false sinon
      */
-    public function match($url)
+    public function match(string $url): bool
     {
         foreach ($this->routes as $route => $params) {
             if (preg_match($route, $url, $matches)) {
-                // Get named capture group values
+                // Extrait uniquement les groupes de capture nommés
                 foreach ($matches as $key => $match) {
                     if (is_string($key)) {
                         $params[$key] = $match;
@@ -85,130 +95,127 @@ class Router
     }
 
     /**
-     * Get the currently matched parameters
+     * Retourne les paramètres de la dernière route correspondante.
      *
-     * @return array
+     * @return array<string, string>
      */
-    public function getParams()
+    public function getParams(): array
     {
         return $this->params;
     }
 
     /**
-     * Dispatch the route, creating the controller object and running the
-     * action method
+     * Dispatche la requête : instancie le contrôleur et appelle l'action.
      *
-     * @param string $url The route URL
+     * @param string $url L'URL de la requête (valeur de $_SERVER['QUERY_STRING'])
      *
      * @return void
+     * @throws \Exception Si aucune route ne correspond, si le contrôleur est introuvable,
+     *                    ou si l'action est suffixée par "Action" (appel direct interdit).
      */
-    public function dispatch($url)
+    public function dispatch(string $url): void
     {
         $url = $this->removeQueryStringVariables($url);
 
         if ($this->match($url)) {
-            $controller = $this->params['controller'];
-            $controller = $this->convertToStudlyCaps($controller);
-            $controller = $this->getNamespace() . $controller;
+            $controllerName = $this->convertToStudlyCaps($this->params['controller']);
+            $controllerClass = $this->getNamespace() . $controllerName;
 
-            if (class_exists($controller)) {
-
-                if(isset($this->params['private']) && !isset($_SESSION['user']['id'])){
-                    throw new \Exception("You must be logged in");
-                }
-
-                $controller_object = new $controller($this->params);
-
-                $action = $this->params['action'];
-                $action = $this->convertToCamelCase($action);
-
-                if (preg_match('/action$/i', $action) == 0) {
-                    $controller_object->$action();
-
-                } else {
-                    throw new \Exception("Method $action in controller $controller cannot be called directly - remove the Action suffix to call this method");
-                }
-            } else {
-                throw new \Exception("Controller class $controller not found");
+            if (!class_exists($controllerClass)) {
+                throw new \Exception("Contrôleur introuvable : $controllerClass");
             }
+
+            // Vérifie l'accès aux routes privées
+            if (isset($this->params['private']) && !isset($_SESSION['user']['id'])) {
+                throw new \Exception('You must be logged in');
+            }
+
+            $controllerObject = new $controllerClass($this->params);
+
+            $action = $this->convertToCamelCase($this->params['action']);
+
+            if (preg_match('/action$/i', $action) !== 0) {
+                throw new \Exception(
+                    "La méthode '$action' du contrôleur '$controllerClass' ne peut pas être " .
+                    "appelée directement — retirez le suffixe 'Action' de l'URL."
+                );
+            }
+
+            $controllerObject->$action();
         } else {
-            throw new \Exception('No route matched.', 404);
+            throw new \Exception('Aucune route ne correspond.', 404);
         }
     }
 
     /**
-     * Convert the string with hyphens to StudlyCaps,
-     * e.g. post-authors => PostAuthors
+     * Convertit une chaîne avec des tirets en StudlyCaps (PascalCase).
      *
-     * @param string $string The string to convert
+     * Exemple : 'post-authors' → 'PostAuthors'
+     *
+     * @param string $string La chaîne à convertir
      *
      * @return string
      */
-    protected function convertToStudlyCaps($string)
+    protected function convertToStudlyCaps(string $string): string
     {
         return str_replace(' ', '', ucwords(str_replace('-', ' ', $string)));
     }
 
     /**
-     * Convert the string with hyphens to camelCase,
-     * e.g. add-new => addNew
+     * Convertit une chaîne avec des tirets en camelCase.
      *
-     * @param string $string The string to convert
+     * Exemple : 'add-new' → 'addNew'
+     *
+     * @param string $string La chaîne à convertir
      *
      * @return string
      */
-    protected function convertToCamelCase($string)
+    protected function convertToCamelCase(string $string): string
     {
         return lcfirst($this->convertToStudlyCaps($string));
     }
 
     /**
-     * Remove the query string variables from the URL (if any). As the full
-     * query string is used for the route, any variables at the end will need
-     * to be removed before the route is matched to the routing table. For
-     * example:
+     * Supprime les paramètres de query string de l'URL.
      *
-     *   URL                           $_SERVER['QUERY_STRING']  Route
+     * Le fichier .htaccess transforme le premier '?' en '&' avant de passer
+     * l'URL à $_SERVER['QUERY_STRING']. Cette méthode isole la partie "route"
+     * de la partie "paramètres".
+     *
+     * Exemples :
+     *   URL                           QUERY_STRING       Route retournée
      *   -------------------------------------------------------------------
-     *   localhost                     ''                        ''
-     *   localhost/?                   ''                        ''
-     *   localhost/?page=1             page=1                    ''
-     *   localhost/posts?page=1        posts&page=1              posts
-     *   localhost/posts/index         posts/index               posts/index
-     *   localhost/posts/index?page=1  posts/index&page=1        posts/index
+     *   localhost                     ''                 ''
+     *   localhost/?page=1             page=1             ''
+     *   localhost/posts?page=1        posts&page=1       posts
+     *   localhost/posts/index?page=1  posts/index&page=1 posts/index
      *
-     * A URL of the format localhost/?page (one variable name, no value) won't
-     * work however. (NB. The .htaccess file converts the first ? to a & when
-     * it's passed through to the $_SERVER variable).
+     * @param string $url L'URL complète issue de QUERY_STRING
      *
-     * @param string $url The full URL
-     *
-     * @return string The URL with the query string variables removed
+     * @return string L'URL sans les paramètres de query string
      */
-    protected function removeQueryStringVariables($url)
+    protected function removeQueryStringVariables(string $url): string
     {
-        if ($url != '') {
-            $parts = explode('&', $url, 2);
-
-            if (strpos($parts[0], '=') === false) {
-                $url = $parts[0];
-            } else {
-                $url = '';
-            }
+        if ($url === '') {
+            return $url;
         }
 
-        return $url;
+        $parts = explode('&', $url, 2);
+
+        return strpos($parts[0], '=') === false ? $parts[0] : '';
     }
 
     /**
-     * Get the namespace for the controller class. The namespace defined in the
-     * route parameters is added if present.
+     * Retourne le namespace complet du contrôleur à instancier.
      *
-     * @return string The request URL
+     * Si un namespace personnalisé est défini dans les paramètres de route,
+     * il est ajouté après le namespace de base.
+     *
+     * @return string Le namespace (ex. : 'App\Controllers\' ou 'App\Controllers\Admin\')
      */
-    protected function getNamespace()
+    protected function getNamespace(): string
     {
-        $namespace = 'App\Controllers\\';
+        $namespace = 'App\\Controllers\\';
 
         if (array_key_exists('namespace', $this->params)) {
             $namespace .= $this->params['namespace'] . '\\';
