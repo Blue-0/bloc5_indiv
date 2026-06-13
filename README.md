@@ -130,9 +130,9 @@ Afin de faciliter la maintenance et le travail en équipe, une convention de nom
 
 ### 2) Typage strict et PHP 7
 Le code a été enrichi avec les fonctionnalités de typage de PHP 7 pour améliorer la robustesse et la détection d'erreurs :
-* Ajout des déclarations de types de paramètres et de retour pour toutes les méthodes des contrôleurs, modèles et classes du noyau (`Core\`).
-* Utilisation d'opérateurs modernes comme l'opérateur de coalescence nulle (`??`) pour simplifier et sécuriser la gestion des variables dans les vues.
-* Typage strict des propriétés clés (comme l'instance PDO dans `Core\Model`).
+* Ajout des déclarations de types de paramètres et de retour pour la quasi-totalité des méthodes des contrôleurs, modèles et classes du noyau (`Core\`) (les types alternatifs comme `array|false` ne pouvant pas être déclarés sans la syntaxe d'union de PHP 8 restent documentés via PHPDoc).
+* Utilisation d'opérateurs modernes comme l'opérateur de coalescence nulle (`??`) pour simplifier et sécuriser la gestion des variables (par exemple pour l'utilisateur en session dans les vues).
+* Typage de retour des méthodes clés (comme le type de retour `PDO` pour la méthode `getDB()` dans `Core\Model`).
 
 ### 3) Amélioration de la sécurité et robustesse
 * **Validation des formulaires** : Remplacement des accès directs aux superglobales par `filter_input` et renforcement des vérifications d'intégrité (ex. validation de la correspondance des mots de passe lors de l'inscription).

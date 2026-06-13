@@ -42,11 +42,11 @@ class Error
      * En mode développement (SHOW_ERRORS = true) : affiche le détail complet.
      * En mode production : journalise l'exception et affiche une page d'erreur Twig.
      *
-     * @param \Exception $exception L'exception non capturée
+     * @param \Throwable $exception L'exception non capturée
      *
      * @return void
      */
-    public static function exceptionHandler(\Exception $exception): void
+    public static function exceptionHandler(\Throwable $exception): void
     {
         // Seuls les codes 404 sont conservés ; tout autre code devient 500
         $code = $exception->getCode() === 404 ? 404 : 500;

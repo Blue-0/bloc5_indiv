@@ -126,7 +126,7 @@ class User extends \Core\Controller
      *
      * @return int|false L'identifiant du nouvel utilisateur, ou false en cas d'erreur
      */
-    private function register(array $data): int|false
+    private function register(array $data)
     {
         try {
             $salt   = Hash::generateSalt(32);

@@ -32,7 +32,7 @@ class Upload
      * @return string Le nom du fichier stocké (avec extension)
      * @throws \Exception Si le fichier est absent, invalide, trop volumineux ou si le déplacement échoue
      */
-    public static function uploadFile(mixed $file, int|string $fileName): string
+    public static function uploadFile($file, $fileName): string
     {
         if (!is_array($file) || !isset($file['error'])) {
             throw new \Exception("Aucun fichier fourni.");
@@ -48,7 +48,7 @@ class Upload
 
         $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
 
-        if (!in_array($extension, self::ALLOWED_EXTENSIONS, strict: true)) {
+        if (!in_array($extension, self::ALLOWED_EXTENSIONS, true)) {
             throw new \Exception("Extension non autorisée. Formats acceptés : JPEG, PNG.");
         }
 

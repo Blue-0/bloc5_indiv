@@ -46,7 +46,7 @@ class User extends Model
      *
      * @return array<string, mixed>|false Les données de l'utilisateur, ou false s'il n'existe pas
      */
-    public static function getByLogin(string $email): array|false
+    public static function getByLogin(string $email)
     {
         $db = static::getDB();
 
@@ -83,7 +83,7 @@ class User extends Model
      *
      * @return array<string, mixed>|false Les données de l'utilisateur, ou false si le jeton est invalide
      */
-    public static function getByRememberToken(string $token): array|false
+    public static function getByRememberToken(string $token)
     {
         $db = static::getDB();
 
