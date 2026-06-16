@@ -58,5 +58,8 @@ try {
 } catch (\Exception $e) {
     if ($e->getMessage() === 'You must be logged in') {
         header('Location: /login');
+        exit;
     }
+    // Relance l'exception pour qu'elle soit gérée par le gestionnaire global
+    throw $e;
 }

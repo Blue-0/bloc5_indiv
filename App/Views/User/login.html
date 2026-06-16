@@ -21,14 +21,20 @@
                     Connexion
                 </div>
                 <div class="l-form">
+                    {% if error is defined and error %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </div>
+                    {% endif %}
                     <form action="" method="post">
                         <div class="form-group">
                             <label for="exampleInputEmail1">Email</label>
                             <input type="email" class="form-control" id="exampleInputEmail1" name="email"
-                                   placeholder="sample@gmail.com">
+                                   placeholder="sample@gmail.com"
+                                   value="{{ email is defined ? email : '' }}">
                         </div>
                         <div class="form-group">
-                            <label for="exampleInputPassword1">Password</label>
+                            <label for="exampleInputPassword1">Mot de passe</label>
                             <input type="password" class="form-control" id="exampleInputPassword1"
                                    name="password" placeholder="**********">
                         </div>
@@ -46,8 +52,8 @@
                                     class="col-lg-7"><button type="submit" name="submit" class="btn btn-cv1">Connexion
                                 </button></div>
                             <div class="hidden-xs">
-                                <div class="col-lg-1 ortext">or</div>
-                                <div class="col-lg-4 signuptext"><a href="signup.html">Inscription</a></div>
+                                <div class="col-lg-1 ortext">ou</div>
+                                <div class="col-lg-4 signuptext"><a href="/register">Inscription</a></div>
                             </div>
                         </div>
                         <div class="row hidden-xs">

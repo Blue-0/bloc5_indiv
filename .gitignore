@@ -3,3 +3,5 @@ vendor
 composer.lock
 /mariadb
 .env
+/INFRA/Prod/mariadb
+/INFRA/Recette/mariadb

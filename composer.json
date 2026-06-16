@@ -1,6 +1,6 @@
 {
     "require": {
-        "twig/twig": "~3.0",
+                "twig/twig": "3.10.3",
       "ext-pdo": "*",
       "ext-json": "*",
         "phpmailer/phpmailer": "^7.1"
@@ -12,6 +12,12 @@
         }
     },
     "config": {
+        "platform": {
+            "php": "7.4.33"
+        },
+        "audit": {
+            "block-insecure": false
+        },
         "policy": {
             "advisories": {
                 "block": false

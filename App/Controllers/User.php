@@ -31,6 +31,13 @@ class User extends \Core\Controller
                 header('Location: /account');
                 exit;
             }
+
+            // Mauvais identifiants : on réaffiche le formulaire avec un message d'erreur
+            View::renderTemplate('User/login.html', [
+                'error' => 'Email ou mot de passe incorrect.',
+                'email' => $formData['email'] ?? '',
+            ]);
+            return;
         }
 
         View::renderTemplate('User/login.html');
@@ -70,6 +77,11 @@ class User extends \Core\Controller
      */
     public function accountAction(): void
     {
+        if (!isset($_SESSION['user']['id'])) {
+            header('Location: /login');
+            exit;
+        }
+
         $articles = Articles::getByUser($_SESSION['user']['id']);
 
         View::renderTemplate('User/account.html', [
@@ -111,6 +123,7 @@ class User extends \Core\Controller
         session_destroy();
 
         header('Location: /');
+        exit;
     }
 
     // -------------------------------------------------------------------------
