@@ -24,7 +24,7 @@ class Articles extends Model
      */
     public static function getAll(string $filter): array
     {
-        $db    = static::getDB();
+        $db = static::getDB();
         $query = 'SELECT * FROM articles';
 
         switch ($filter) {
@@ -144,9 +144,9 @@ class Articles extends Model
 
         $publishedDate = (new DateTime())->format('Y-m-d');
 
-        $stmt->bindParam(':name',           $data['name']);
-        $stmt->bindParam(':description',    $data['description']);
-        $stmt->bindParam(':user_id',        $data['user_id']);
+        $stmt->bindParam(':name', $data['name']);
+        $stmt->bindParam(':description', $data['description']);
+        $stmt->bindParam(':user_id', $data['user_id']);
         $stmt->bindParam(':published_date', $publishedDate);
 
         $stmt->execute();
@@ -168,7 +168,7 @@ class Articles extends Model
 
         $stmt = $db->prepare('UPDATE articles SET picture = :picture WHERE articles.id = :articleId');
 
-        $stmt->bindParam(':picture',   $pictureName);
+        $stmt->bindParam(':picture', $pictureName);
         $stmt->bindParam(':articleId', $articleId);
 
         $stmt->execute();

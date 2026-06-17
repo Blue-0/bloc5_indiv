@@ -24,7 +24,7 @@ class Api extends \Core\Controller
      */
     public function productsAction(): void
     {
-        $sort     = filter_input(INPUT_GET, 'sort', FILTER_SANITIZE_SPECIAL_CHARS) ?? '';
+        $sort = filter_input(INPUT_GET, 'sort', FILTER_SANITIZE_SPECIAL_CHARS) ?? '';
         $articles = Articles::getAll($sort);
 
         header('Content-Type: application/json');
@@ -41,7 +41,7 @@ class Api extends \Core\Controller
      */
     public function citiesAction(): void
     {
-        $query  = filter_input(INPUT_GET, 'query', FILTER_SANITIZE_SPECIAL_CHARS) ?? '';
+        $query = filter_input(INPUT_GET, 'query', FILTER_SANITIZE_SPECIAL_CHARS) ?? '';
         $cities = Cities::search($query);
 
         header('Content-Type: application/json');
