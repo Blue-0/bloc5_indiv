@@ -6,11 +6,8 @@ services:
         volumes:
             - ".:/var/www/html/"
             - "vendor:/var/www/html/vendor"
-        environment:
-            - DB_HOST=db
-            - DB_NAME=videgrenierenligne
-            - DB_USER=webapplication
-            - DB_PASSWORD=653rag9T
+        env_file:
+            - .env
         depends_on:
             db:
                 condition: service_healthy
@@ -19,11 +16,8 @@ services:
         image: mariadb:10.11
         ports:
             - "3306:3306"
-        environment:
-            - MARIADB_ROOT_PASSWORD=root
-            - MARIADB_USER=webapplication
-            - MARIADB_PASSWORD=653rag9T
-            - MARIADB_DATABASE=videgrenierenligne
+        env_file:
+            - .env
         volumes:
             - ./mariadb:/var/lib/mysql
             - ./sql/import.sql:/docker-entrypoint-initdb.d/01-import.sql:ro
