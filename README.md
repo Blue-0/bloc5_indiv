@@ -2,6 +2,9 @@
 
 Ce Readme.md est à destination des futurs repreneurs du site-web Vide Grenier en Ligne.
 
+Support utilisateur : https://docs.google.com/document/d/1kBjnFvO53A3LC2BtEJqCjcZObCmJ8Ouq7J56AhBwvXk/edit?tab=t.0
+Mise en production : https://docs.google.com/document/d/1FOCHiiHU9ekAJJHU5TY6ENkT3co4d-GVS26VFQDID7k/edit?usp=sharing
+
 ## Mise en place du projet back-end
 
 1. Créez un VirtualHost pointant vers le dossier /public du site web (Apache)
