@@ -27,9 +27,9 @@ if (!isset($_SESSION['user']) && isset($_COOKIE['remember_me'])) {
         $user = \App\Models\User::getByRememberToken($_COOKIE['remember_me']);
         if ($user) {
             $_SESSION['user'] = [
-                'id'       => $user['id'],
+                'id' => $user['id'],
                 'username' => $user['username'],
-                'email'    => $user['email'],
+                'email' => $user['email'],
             ];
         }
     } catch (\Exception $e) {
@@ -42,13 +42,13 @@ if (!isset($_SESSION['user']) && isset($_COOKIE['remember_me'])) {
 // Déclaration de la table de routage
 $router = new Core\Router();
 
-$router->add('',                    ['controller' => 'Home',    'action' => 'index']);
-$router->add('login',               ['controller' => 'User',    'action' => 'login']);
-$router->add('register',            ['controller' => 'User',    'action' => 'register']);
-$router->add('logout',              ['controller' => 'User',    'action' => 'logout',  'private' => true]);
-$router->add('account',             ['controller' => 'User',    'action' => 'account', 'private' => true]);
-$router->add('product',             ['controller' => 'Product', 'action' => 'index',   'private' => true]);
-$router->add('product/{id:\d+}',    ['controller' => 'Product', 'action' => 'show']);
+$router->add('', ['controller' => 'Home', 'action' => 'index']);
+$router->add('login', ['controller' => 'User', 'action' => 'login']);
+$router->add('register', ['controller' => 'User', 'action' => 'register']);
+$router->add('logout', ['controller' => 'User', 'action' => 'logout', 'private' => true]);
+$router->add('account', ['controller' => 'User', 'action' => 'account', 'private' => true]);
+$router->add('product', ['controller' => 'Product', 'action' => 'index', 'private' => true]);
+$router->add('product/{id:\d+}', ['controller' => 'Product', 'action' => 'show']);
 $router->add('{controller}/{action}');
 
 

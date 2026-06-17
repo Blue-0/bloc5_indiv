@@ -24,16 +24,17 @@
                             </div>
                             <div class="col-lg-2 col-sm-2 col-xs-4">
                                 <div class="btn-group pull-right bg-clean">
-                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                        aria-haspopup="true" aria-expanded="false">
                                         Filtrer par <span class="caret"></span>
                                     </button>
                                     <ul class="dropdown-menu">
                                         <li><a onclick="getProductsAndRender('views')"><i
-                                                class="cv cvicon-cv-calender"></i>
-                                            Popularité</a></li>
+                                                    class="cv cvicon-cv-calender"></i>
+                                                Popularité</a></li>
                                         <li><a onclick="getProductsAndRender('date')"><i
-                                                class="cv cvicon-cv-calender"></i>
-                                            Récent</a></li>
+                                                    class="cv cvicon-cv-calender"></i>
+                                                Récent</a></li>
                                     </ul>
                                 </div>
                                 <div class="clearfix"></div>
@@ -56,40 +57,40 @@
 
 
 {% block javascript %}
-    <script type="text/javascript">
+<script type="text/javascript">
 
-        function getProductsAndRender(option = ''){
-            $.ajax({
-                url: "/api/products" + '?sort=' + option,
-            }).done(function(result) {
-                $('#articlelist').empty();
-                for(let i = 0; i < result.length; i++){
-                    renderProduct(result[i])
-                }
-            });
-        }
-
-        function renderProduct($product){
-             $('<div class="col-lg-4 col-sm-6 articleitem" id="article-pattern">' +
-                '                                <div class="b-article">' +
-                '                                    <div class="v-img">' +
-                '                                        <a href="/product/'+ $product.id + '">' +
-                '                                            <img src="/storage/'+ $product.picture +'" alt=""></a>' +
-                '                                    </div>' +
-                '                                    <div class="v-desc">' +
-                '                                        <a href="/product/'+ $product.id + '">'+ $product.name+'</a>' +
-                '                                    </div>' +
-                '                                    <p>'+ $product.description.slice(0, 20) + '...</p>' +
-                '                                    <div class="v-views">' +
-                '                                        '+$product.views+' vues' +
-                '                                    </div>' +
-                '                                </div>' +
-                '</div>')
-             .appendTo($('#articlelist'));
-        }
-
-        $( document ).ready(function() {
-            getProductsAndRender();
+    function getProductsAndRender(option = '') {
+        $.ajax({
+            url: "/api/products" + '?sort=' + option,
+        }).done(function (result) {
+            $('#articlelist').empty();
+            for (let i = 0; i < result.length; i++) {
+                renderProduct(result[i])
+            }
         });
-    </script>
+    }
+
+    function renderProduct($product) {
+        $('<div class="col-lg-4 col-sm-6 articleitem" id="article-pattern">' +
+            '                                <div class="b-article">' +
+            '                                    <div class="v-img">' +
+            '                                        <a href="/product/' + $product.id + '">' +
+            '                                            <img src="/storage/' + $product.picture + '" alt=""></a>' +
+            '                                    </div>' +
+            '                                    <div class="v-desc">' +
+            '                                        <a href="/product/' + $product.id + '">' + $product.name + '</a>' +
+            '                                    </div>' +
+            '                                    <p>' + $product.description.slice(0, 20) + '...</p>' +
+            '                                    <div class="v-views">' +
+            '                                        ' + $product.views + ' vues' +
+            '                                    </div>' +
+            '                                </div>' +
+            '</div>')
+            .appendTo($('#articlelist'));
+    }
+
+    $(document).ready(function () {
+        getProductsAndRender();
+    });
+</script>
 {% endblock %}
