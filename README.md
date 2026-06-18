@@ -107,7 +107,7 @@ $db = static::getDB();
   - Dans la méthode `logoutAction()` : suppression du token en base de données et destruction du cookie.
 - **Bootstrapping (Auto-connexion)** : Ajout d'une vérification dans le fichier d'entrée [public/index.php](public/index.php). Si l'utilisateur n'est pas connecté en session mais possède le cookie `remember_me`, il est automatiquement connecté après vérification en base de données.
 
-### 5) Formulaire de contact vendeur (Mailtrap + SOLID)
+### 5) Formulaire de contact vendeur (Mailtrap)
 
 **Problématique**
 - Le bouton de contact sur la page du produit ouvrait directement la boîte de messagerie par défaut de l'utilisateur via un lien `mailto:`, sans formulaire intégré ni traitement applicatif.
